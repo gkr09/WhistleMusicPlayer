@@ -18,14 +18,17 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
     private static final String TAG= "Recycler View Adapter";
 
     private Context context;
-    private ArrayList<String> title = new ArrayList<>();
-    private ArrayList<String> artist = new ArrayList<>();
+  //  private ArrayList<String> title = new ArrayList<>();
+   // private ArrayList<String> artist = new ArrayList<>();
+    private ArrayList<SongObject> songs;
 
-    public MainRecyclerViewAdapter(Context context, ArrayList<String> title, ArrayList<String> artist) {
+    public MainRecyclerViewAdapter(Context context, ArrayList<SongObject> songs){//ArrayList<String> title, ArrayList<String> artist) {
         this.context = context;
-        this.title = title;
-        this.artist = artist;
-    }
+        this.songs=songs;
+       // for(SongObject song : songs){
+        //this.title.add(song.title);
+       // this.artist.add(song.artist);
+    }//}
 
     @NonNull
     @Override
@@ -41,23 +44,30 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
 
         Log.d(TAG, "onBindViewHolder: called.");
 
-        holder.SongTitle.setText(title.get(pos));
-        Log.d(TAG, "onBindViewHolder: ADDED-->>"+title.get(pos));
-        holder.SongArtist.setText(artist.get(pos));
+        holder.SongTitle.setText(songs.get(pos).title);
+        Log.d(TAG, "onBindViewHolder: ADDED-->>"+songs.get(pos).title);
+        holder.SongArtist.setText(songs.get(pos).artist);
 
         holder.SongListItem.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                Log.d(TAG, "onClick: CLICKED ON--->>>: " + artist.get(pos));
-                Toast.makeText(context,title.get(pos),Toast.LENGTH_SHORT).show();
+                Toast.makeText(context,songs.get(pos).title,Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        Log.d(TAG, "getItemCount: ITEMCOUNT HERE---->>>>"+title.size());
-        return title.size();
+        Log.d(TAG, "getItemCount: ITEMCOUNT HERE---->>>>"+songs.size());
+        return songs.size();
+    }
+
+    public void updateList(ArrayList<SongObject> filteredList){
+
+        songs = new ArrayList<>();
+        songs.addAll(filteredList);
+        notifyDataSetChanged();
+
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
