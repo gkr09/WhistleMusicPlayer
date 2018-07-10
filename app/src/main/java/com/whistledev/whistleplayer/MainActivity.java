@@ -1,9 +1,11 @@
 package com.whistledev.whistleplayer;
 
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.widget.SearchView;
 import android.util.Log;
 
@@ -72,6 +74,25 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         adapter = new MainRecyclerViewAdapter(this,songArray);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        //Swipe to Remove
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(createItemTouchHelper());
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+    }
+
+    private ItemTouchHelper.Callback createItemTouchHelper() {
+        ItemTouchHelper.Callback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder viewHolder1) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+                adapter.removeSong(viewHolder.getAdapterPosition());
+            }
+        };
+    return simpleCallback;
     }
 
     @Override

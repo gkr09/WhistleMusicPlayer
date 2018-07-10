@@ -70,6 +70,11 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
 
     }
 
+    public void removeSong(int pos){
+        songs.remove(pos);
+        notifyDataSetChanged();
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder{
 
         ConstraintLayout SongListItem;
@@ -78,7 +83,6 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-
             SongListItem = itemView.findViewById(R.id.mainSongListItem);
             SongTitle = itemView.findViewById(R.id.mainSongListTitle);
             SongArtist = itemView.findViewById(R.id.mainSongListArtist);
