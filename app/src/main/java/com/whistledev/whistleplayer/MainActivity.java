@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.util.Log;
 
@@ -19,6 +20,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
    // private ArrayList<String> artists = new ArrayList<>();
     private ArrayList<SongObject> songArray= new ArrayList<>();
     MainRecyclerViewAdapter adapter;
+    ImageButton queueButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +29,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         initSongs();
         SearchView searchView = findViewById(R.id.mainSearchView);
         searchView.setOnQueryTextListener(this);
+        queueButton = findViewById(R.id.queueButton);
+        queueButton.setOnDragListener(new DragListener());//<----HERE
     }
 
     private void initSongs(){
@@ -89,7 +93,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
-                adapter.removeSong(viewHolder.getAdapterPosition());
+               // adapter.removeSong(viewHolder.getAdapterPosition());
+                songArray.remove(viewHolder.getAdapterPosition());
+                adapter.updateList(songArray);
             }
         };
     return simpleCallback;

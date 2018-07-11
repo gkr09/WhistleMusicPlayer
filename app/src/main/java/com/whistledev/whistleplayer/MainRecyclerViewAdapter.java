@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerViewAdapter.ViewHolder>{
 
@@ -24,7 +25,8 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
 
     public MainRecyclerViewAdapter(Context context, ArrayList<SongObject> songs){//ArrayList<String> title, ArrayList<String> artist) {
         this.context = context;
-        this.songs=songs;
+        this.songs= songs;
+        Collections.sort(this.songs);
        // for(SongObject song : songs){
         //this.title.add(song.title);
        // this.artist.add(song.artist);
@@ -70,10 +72,10 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
 
     }
 
-    public void removeSong(int pos){
-        songs.remove(pos);
-        notifyDataSetChanged();
-    }
+   // public void removeSong(int pos){
+     //   songs.remove(pos);
+     //   notifyDataSetChanged();
+    //}
 
     public class ViewHolder extends RecyclerView.ViewHolder{
 
@@ -86,6 +88,8 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
             SongListItem = itemView.findViewById(R.id.mainSongListItem);
             SongTitle = itemView.findViewById(R.id.mainSongListTitle);
             SongArtist = itemView.findViewById(R.id.mainSongListArtist);
+            itemView.setOnLongClickListener(new DragTouchListener());
+
         }
     }
 }

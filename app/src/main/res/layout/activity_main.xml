@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
+    android:clipChildren="true"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintTop_toTopOf="parent"
     tools:context=".MainActivity">
@@ -13,20 +14,26 @@
         android:id="@+id/mainSearchView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:contentDescription="Search Songs"
         android:iconifiedByDefault="true"
         android:layoutDirection="rtl"
         android:textDirection="locale"
         app:layout_constraintBottom_toTopOf="@+id/mainScrollView"
-        app:layout_constraintLeft_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+    </SearchView>
 
     <ScrollView
         android:id="@+id/mainScrollView"
         style="@style/scrollStyle"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:fillViewport="true"
+        android:clipChildren="true"
+        android:clipToPadding="true"
+        android:fillViewport="false"
         android:verticalScrollbarPosition="left"
         app:layout_constraintBottom_toTopOf="@id/controlsLayout"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -36,7 +43,9 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/mainRecyclerView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:clipChildren="true"
+            android:clipToPadding="true">
 
         </android.support.v7.widget.RecyclerView>
     </ScrollView>
@@ -134,12 +143,12 @@
                 android:id="@+id/queueButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
                 android:background="@drawable/selected_bg"
                 android:contentDescription="Queue"
                 android:minHeight="25dp"
                 android:minWidth="25dp"
                 android:scaleType="fitCenter"
-                android:layout_marginStart="6dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintHorizontal_chainStyle="spread_inside"
                 app:layout_constraintLeft_toLeftOf="parent"
