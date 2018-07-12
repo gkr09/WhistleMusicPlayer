@@ -1,6 +1,10 @@
 package com.whistledev.whistleplayer;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,18 +13,21 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
+public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener,ActivityCompat.OnRequestPermissionsResultCallback{
 
     private static final String TAG = "MainActivity";
 
     //private ArrayList<String> titles = new ArrayList<>();
    // private ArrayList<String> artists = new ArrayList<>();
-    private ArrayList<SongObject> songArray= new ArrayList<>();
+    private ArrayList<SongObject> songArray;//= new ArrayList<>();
     MainRecyclerViewAdapter adapter;
     ImageButton queueButton;
+
+    private static final int READ_STORAGE_PERMISSION_REQUEST_CODE = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +43,13 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private void initSongs(){
         Log.d(TAG, "initSongs: started initing names and artisis");
 
+        if(checkPermissionForReadExternalStorage()) {
+            MusicPlayer player = new MusicPlayer(this);
+            songArray = player.getSongList();
+        }else {
+            requestPermissionForReadExternalStorage();
+        }
+        /**
         songArray.add(new SongObject("Bohemian Rhapsody","Queen"));
         songArray.add(new SongObject("Time","Pink Floyd"));
         songArray.add(new SongObject("Another One Bites The Dust","Queen"));
@@ -48,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         songArray.add(new SongObject("Love The Way You Lie","Eminem"));
 
 
-     /**   titles.add("Bohemian Rhapsody");
+        titles.add("Bohemian Rhapsody");
         artists.add("Queen");
         titles.add("Time");
         artists.add("Pink Floyd");
@@ -119,4 +133,45 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         return true;
     }
+
+    public boolean checkPermissionForReadExternalStorage() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int result = this.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
+            return result == PackageManager.PERMISSION_GRANTED;
+        }
+        return false;
+    }
+
+    public void requestPermissionForReadExternalStorage() {
+        try {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_STORAGE_PERMISSION_REQUEST_CODE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        // BEGIN_INCLUDE(onRequestPermissionsResult)
+        if (requestCode == READ_STORAGE_PERMISSION_REQUEST_CODE) {
+            // Request for camera permission.
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission has been granted. Start camera preview Activity.
+             //   Snackbar.make(mLayout, R.string.camera_permission_granted,
+               //         Snackbar.LENGTH_SHORT)
+                 //       .show();
+                initSongs();
+            } else {
+                Toast.makeText(this,"Uh Oh.....Bye Bye !!", Toast.LENGTH_SHORT).show();
+                // Permission request was denied.
+             //   Snackbar.make(mLayout, R.string.camera_permission_denied,
+               //         Snackbar.LENGTH_SHORT)
+                 //       .show();
+            }
+        }
+        // END_INCLUDE(onRequestPermissionsResult)
+    }
+
 }

@@ -13,6 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/hkgrotesk_regular"
+        android:singleLine="true"
         android:text="Title"
         android:textColor="#000000"
         android:textSize="25sp" />
@@ -22,6 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/hkgrotesk_regular"
+        android:singleLine="true"
         android:text="Artist"
         android:textSize="20sp"
         app:layout_constraintTop_toBottomOf="@id/mainSongListTitle" />
