@@ -47,15 +47,16 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
         Log.d(TAG, "onBindViewHolder: called.");
 
         holder.SongTitle.setText(songs.get(pos).title);
+        Log.d(TAG, ": POS------>>."+pos);
+        holder.getView().setTag(pos);
         Log.d(TAG, "onBindViewHolder: ADDED-->>"+songs.get(pos).title);
         holder.SongArtist.setText(songs.get(pos).artist);
-
-        holder.SongListItem.setOnClickListener(new View.OnClickListener(){
+     /**   holder.SongListItem.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
                 Toast.makeText(context,songs.get(pos).title,Toast.LENGTH_SHORT).show();
             }
-        });
+        });**/
     }
 
     @Override
@@ -90,6 +91,9 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
             SongArtist = itemView.findViewById(R.id.mainSongListArtist);
             itemView.setOnLongClickListener(new DragTouchListener());
 
+        }
+        public ConstraintLayout getView(){
+            return SongListItem;
         }
     }
 }

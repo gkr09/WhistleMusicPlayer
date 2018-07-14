@@ -19,36 +19,28 @@
         android:iconifiedByDefault="true"
         android:layoutDirection="rtl"
         android:textDirection="locale"
-        app:layout_constraintBottom_toTopOf="@+id/mainScrollView"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
     </SearchView>
 
-    <ScrollView
-        android:id="@+id/mainScrollView"
-        style="@style/scrollStyle"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/mainRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:fillViewport="false"
-        android:verticalScrollbarPosition="left"
-        app:layout_constraintBottom_toTopOf="@id/controlsLayout"
+        android:fadeScrollbars="false"
+        app:fastScrollEnabled="true"
+        app:fastScrollHorizontalThumbDrawable="@drawable/scroll_thumb_drawable"
+        app:fastScrollHorizontalTrackDrawable="@drawable/scroll_track_drawable"
+        app:fastScrollVerticalThumbDrawable="@drawable/scroll_thumb_drawable"
+        app:fastScrollVerticalTrackDrawable="@drawable/scroll_track_drawable"
+        app:layout_constraintBottom_toTopOf="@+id/controlsLayout"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/mainSearchView">
+        app:layout_constraintTop_toBottomOf="@+id/mainSearchView">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/mainRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipChildren="false"
-            android:clipToPadding="false">
-
-        </android.support.v7.widget.RecyclerView>
-    </ScrollView>
+    </android.support.v7.widget.RecyclerView>
 
     <LinearLayout
         android:id="@+id/controlsLayout"
@@ -60,7 +52,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mainScrollView">
+        app:layout_constraintTop_toBottomOf="@id/mainRecyclerView">
 
         <TextView
             android:id="@+id/currentTrackLabel"

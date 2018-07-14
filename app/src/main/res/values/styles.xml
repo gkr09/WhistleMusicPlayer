@@ -8,7 +8,7 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="scrollStyle">
+  <!--  <style name="scrollStyle">
         <item name="android:scrollbarAlwaysDrawVerticalTrack">true</item>
         <item name="android:scrollbarStyle">insideOverlay</item>
         <item name="android:scrollbars">vertical</item>
@@ -17,6 +17,15 @@
         <item name="android:scrollbarTrackVertical">@drawable/scroll_track</item>
         <item name="android:scrollbarSize">5dp</item>
         <item name="android:scrollbarFadeDuration">0</item>
-    </style>
+        <item name="android:verticalScrollbarPosition">left</item>
+        <item name="android:fastScrollEnabled">true</item>
+        <item name="android:fastScrollAlwaysVisible">true</item>
+    </style> -->
+ <!--   <style name="scrollStyle">
+        <item name="android:scrollbars">vertical</item>
+        <item name="fastScrollEnabled=">true</item>
+        <item name="fastScrollVerticalThumbDrawable">@drawable/scroll_thumb</item>
+        <item name="fastScrollVerticalTrackDrawable">@drawable/scroll_track</item>
+    </style> -->
 
 </resources>

@@ -1,15 +1,21 @@
 package com.whistledev.whistleplayer;
 
 import android.Manifest;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.util.Log;
@@ -26,6 +32,11 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private ArrayList<SongObject> songArray;//= new ArrayList<>();
     MainRecyclerViewAdapter adapter;
     ImageButton queueButton;
+    MusicLoader loader;
+
+    private MusicPlayerService musicSrv;
+    private Intent playIntent;
+    private boolean musicBound=false;
 
     private static final int READ_STORAGE_PERMISSION_REQUEST_CODE = 0;
 
@@ -40,14 +51,50 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         queueButton.setOnDragListener(new DragListener());//<----HERE
     }
 
+
+    @Override
+    protected void onStart() {
+        Log.d(TAG, "onStart: called <-----");
+        super.onStart();
+        if(playIntent==null){
+            playIntent = new Intent(this, MusicPlayerService.class);
+            bindService(playIntent, musicConnection, this.BIND_AUTO_CREATE);
+            startService(playIntent);
+        }
+    }
+
+    //connect to the service
+    private ServiceConnection musicConnection = new ServiceConnection(){
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            MusicPlayerService.MusicBinder binder = (MusicPlayerService.MusicBinder)service;
+            //get service
+            musicSrv = binder.getService();
+            Log.d(TAG, "onServiceConnected: called <------");
+            //pass list
+            musicSrv.setList(songArray);
+            musicBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            musicBound = false;
+        }
+    };
+
     private void initSongs(){
         Log.d(TAG, "initSongs: started initing names and artisis");
-
+        if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
         if(checkPermissionForReadExternalStorage()) {
-            MusicPlayer player = new MusicPlayer(this);
-            songArray = player.getSongList();
-        }else {
+            Log.d(TAG, "PERMISSION ---->: "+checkPermissionForReadExternalStorage());
+            loader = new MusicLoader(this);
+            songArray = loader.getSongList();
+        }else
             requestPermissionForReadExternalStorage();
+        else {
+            loader = new MusicLoader(this);
+            songArray = loader.getSongList();
         }
         /**
         songArray.add(new SongObject("Bohemian Rhapsody","Queen"));
@@ -130,6 +177,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             }
         }
         adapter.updateList(filteredList);
+        musicSrv.setList(filteredList);
 
         return true;
     }
@@ -172,6 +220,13 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             }
         }
         // END_INCLUDE(onRequestPermissionsResult)
+    }
+
+    public void songPicked(View view){
+        if(view instanceof ConstraintLayout)
+            Log.d(TAG, "YESssssssssssssssssssssssssssssssss --> "+view.getTag().toString());
+        musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
+        musicSrv.playSong();
     }
 
 }

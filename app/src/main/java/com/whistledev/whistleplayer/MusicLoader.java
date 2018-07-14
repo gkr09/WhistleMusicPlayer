@@ -8,12 +8,12 @@ import android.support.v7.app.AppCompatActivity;
 
 import java.util.ArrayList;
 
-public class MusicPlayer{
+public class MusicLoader {
 
     private ArrayList<SongObject> songList;
     private Context context;
 
-    public MusicPlayer(Context context){
+    public MusicLoader(Context context){
         songList = new ArrayList<>();
         this.context = context;
     }
