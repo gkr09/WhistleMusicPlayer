@@ -18,7 +18,7 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
 
     private MediaPlayer player;
     private ArrayList<SongObject> songs;
-    private int pos;
+    private int currId;
     private final IBinder musicBind = new MusicBinder();
 
     @Nullable
@@ -39,7 +39,7 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
         //create the service
         super.onCreate();
         player = new MediaPlayer();
-        pos = 0;
+        currId = 0;
 
         initMusicPlayer();
     }
@@ -70,8 +70,8 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
     public void playSong(){
         //play a song
         player.reset();
-        SongObject playsong = songs.get(pos);
-        long currSong = playsong.id;
+       // SongObject playsong = songs.get(pos);
+        long currSong = currId;//playsong.id;
         Uri trackUri = ContentUris.withAppendedId(android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, currSong);
 
         try{
@@ -100,7 +100,7 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
 
     }
 
-    public void setSong(int songIndex){
-        pos=songIndex;
+    public void setSong(int songId){
+        currId=songId;
     }
 }

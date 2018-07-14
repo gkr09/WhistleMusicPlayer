@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     MainRecyclerViewAdapter adapter;
     ImageButton queueButton;
     MusicLoader loader;
+    RecyclerView recyclerView;
 
     private MusicPlayerService musicSrv;
     private Intent playIntent;
@@ -135,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     private void initRecyclerView(){
         Log.d(TAG, "initRecyclerView: Starting recyclerview");
-        RecyclerView recyclerView = findViewById(R.id.mainRecyclerView);
+        recyclerView = findViewById(R.id.mainRecyclerView);
         adapter = new MainRecyclerViewAdapter(this,songArray);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -155,7 +157,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
                // adapter.removeSong(viewHolder.getAdapterPosition());
-                songArray.remove(viewHolder.getAdapterPosition());
+                removeSong(viewHolder.getAdapterPosition());
+                //songArray.remove(viewHolder.getAdapterPosition());
                 adapter.updateList(songArray);
             }
         };
@@ -177,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             }
         }
         adapter.updateList(filteredList);
-        musicSrv.setList(filteredList);
+       // musicSrv.setList(filteredList);
 
         return true;
     }
@@ -223,10 +226,18 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     }
 
     public void songPicked(View view){
-        if(view instanceof ConstraintLayout)
-            Log.d(TAG, "YESssssssssssssssssssssssssssssssss --> "+view.getTag().toString());
         musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
         musicSrv.playSong();
+    }
+
+    private void removeSong(int i){
+        long id = Integer.parseInt(recyclerView.findViewHolderForLayoutPosition(i).itemView.getTag().toString());
+        for(int x=0;x<songArray.size();x++)
+            if(songArray.get(x).id == id) {
+                songArray.remove(x);
+                Snackbar.make(recyclerView, "Removed "+songArray.get(x).title,Snackbar.LENGTH_SHORT).show();
+            }
+
     }
 
 }

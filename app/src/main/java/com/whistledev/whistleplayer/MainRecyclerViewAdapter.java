@@ -48,7 +48,7 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
 
         holder.SongTitle.setText(songs.get(pos).title);
         Log.d(TAG, ": POS------>>."+pos);
-        holder.getView().setTag(pos);
+        holder.getView().setTag(songs.get(pos).id);//(pos);
         Log.d(TAG, "onBindViewHolder: ADDED-->>"+songs.get(pos).title);
         holder.SongArtist.setText(songs.get(pos).artist);
      /**   holder.SongListItem.setOnClickListener(new View.OnClickListener(){
