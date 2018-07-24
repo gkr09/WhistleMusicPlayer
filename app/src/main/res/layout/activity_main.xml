@@ -2,68 +2,79 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/topLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
     android:clipChildren="true"
+    android:layoutDirection="locale"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintTop_toTopOf="parent"
     tools:context=".MainActivity">
 
-    <SearchView
-        android:id="@+id/mainSearchView"
+    <com.whistledev.whistleplayer.ControlsLayout
+        android:id="@+id/searchLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:contentDescription="Search Songs"
-        android:iconifiedByDefault="true"
-        android:layoutDirection="rtl"
-        android:textDirection="locale"
+        app:isVertical="false"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-    </SearchView>
+        <SearchView
+            android:id="@+id/mainSearchView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:contentDescription="Search Songs"
+            android:iconifiedByDefault="true"
+            android:textDirection="locale" />
+
+    </com.whistledev.whistleplayer.ControlsLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/mainRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="105dp"
+        android:layout_marginTop="45dp"
+        android:clipToPadding="false"
         android:fadeScrollbars="false"
+        android:paddingBottom="5dp"
         app:fastScrollEnabled="true"
         app:fastScrollHorizontalThumbDrawable="@drawable/scroll_thumb_drawable"
         app:fastScrollHorizontalTrackDrawable="@drawable/scroll_track_drawable"
         app:fastScrollVerticalThumbDrawable="@drawable/scroll_thumb_drawable"
         app:fastScrollVerticalTrackDrawable="@drawable/scroll_track_drawable"
-        app:layout_constraintBottom_toTopOf="@+id/controlsLayout"
+        app:layout_constraintBottom_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mainSearchView">
+        app:layout_constraintTop_toTopOf="parent">
 
     </android.support.v7.widget.RecyclerView>
 
-    <LinearLayout
+    <com.whistledev.whistleplayer.ControlsLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/controlsLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/shadow_bg"
-        android:fadeScrollbars="false"
+        android:layoutDirection="locale"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/mainRecyclerView">
+        app:layout_constraintRight_toRightOf="parent">
+
 
         <TextView
             android:id="@+id/currentTrackLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="3"
             android:fontFamily="@font/hkgrotesk_regular"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:paddingTop="5dp"
-            android:text="Bohemian Rhapsody"
+            android:singleLine="true"
+            android:text=" - - - -"
             android:textColor="#000000"
             android:textSize="25sp" />
 
@@ -82,13 +93,16 @@
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="10dp">
+            android:layout_gravity="fill_vertical"
+            android:layoutDirection="inherit"
+            android:paddingBottom="10dp"
+            android:paddingEnd="5dp"
+            android:paddingStart="7dp">
 
             <ImageButton
                 android:id="@+id/switchThemeButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="5dp"
                 android:background="@drawable/selected_bg"
                 android:contentDescription="Switch Theme"
                 android:minHeight="25dp"
@@ -96,8 +110,7 @@
                 android:scaleType="fitCenter"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintLeft_toRightOf="@id/shuffleButton"
-                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/shuffleButton"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/invert_color_icon" />
 
@@ -111,8 +124,8 @@
                 android:minWidth="25dp"
                 android:scaleType="fitCenter"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toRightOf="@+id/queueButton"
-                app:layout_constraintRight_toLeftOf="@id/prevButton"
+                app:layout_constraintEnd_toStartOf="@+id/prevButton"
+                app:layout_constraintStart_toEndOf="@+id/queueButton"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/timer_icon" />
 
@@ -126,8 +139,8 @@
                 android:minWidth="25dp"
                 android:scaleType="fitCenter"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toRightOf="@id/nextButton"
-                app:layout_constraintRight_toLeftOf="@+id/switchThemeButton"
+                app:layout_constraintEnd_toStartOf="@+id/switchThemeButton"
+                app:layout_constraintStart_toEndOf="@+id/nextButton"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/shuffle_icon" />
 
@@ -135,16 +148,15 @@
                 android:id="@+id/queueButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
                 android:background="@drawable/selected_bg"
                 android:contentDescription="Queue"
                 android:minHeight="25dp"
                 android:minWidth="25dp"
                 android:scaleType="fitCenter"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/sleepTimerButton"
                 app:layout_constraintHorizontal_chainStyle="spread_inside"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toLeftOf="@id/sleepTimerButton"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/queue_icon" />
 
@@ -156,10 +168,11 @@
                 android:contentDescription="Previous Track"
                 android:minHeight="25dp"
                 android:minWidth="25dp"
+                android:onClick="prevSong"
                 android:scaleType="fitCenter"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toRightOf="@id/sleepTimerButton"
-                app:layout_constraintRight_toLeftOf="@id/playButton"
+                app:layout_constraintEnd_toStartOf="@+id/playButton"
+                app:layout_constraintStart_toEndOf="@+id/sleepTimerButton"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/prev_icon" />
 
@@ -172,10 +185,11 @@
                 android:contentDescription="Next Track"
                 android:minHeight="25dp"
                 android:minWidth="25dp"
+                android:onClick="nextSong"
                 android:scaleType="fitCenter"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toRightOf="@id/playButton"
-                app:layout_constraintRight_toLeftOf="@+id/shuffleButton"
+                app:layout_constraintEnd_toStartOf="@+id/shuffleButton"
+                app:layout_constraintStart_toEndOf="@+id/playButton"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/next_icon" />
 
@@ -187,14 +201,15 @@
                 android:contentDescription="Play"
                 android:minHeight="50dp"
                 android:minWidth="50dp"
+                android:onClick="playPause"
                 android:scaleType="fitCenter"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toRightOf="@+id/prevButton"
-                app:layout_constraintRight_toLeftOf="@+id/nextButton"
+                app:layout_constraintEnd_toStartOf="@+id/nextButton"
+                app:layout_constraintStart_toEndOf="@id/prevButton"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/play_icon" />
         </android.support.constraint.ConstraintLayout>
 
-    </LinearLayout>
+    </com.whistledev.whistleplayer.ControlsLayout>
 
 </android.support.constraint.ConstraintLayout>

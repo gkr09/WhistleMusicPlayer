@@ -2,9 +2,11 @@ package com.whistledev.whistleplayer;
 
 import android.Manifest;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
@@ -16,29 +18,48 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener,ActivityCompat.OnRequestPermissionsResultCallback{
+public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener,ActivityCompat.OnRequestPermissionsResultCallback {
 
     private static final String TAG = "MainActivity";
 
     //private ArrayList<String> titles = new ArrayList<>();
-   // private ArrayList<String> artists = new ArrayList<>();
+    // private ArrayList<String> artists = new ArrayList<>();
     private ArrayList<SongObject> songArray;//= new ArrayList<>();
     MainRecyclerViewAdapter adapter;
     ImageButton queueButton;
     MusicLoader loader;
     RecyclerView recyclerView;
+    ImageButton playButton;
+    TextView currentLabel;
+    SearchView searchView;
+    ViewGroup controlsLayout;
+    ViewGroup searchLayout;
+
+    Animation searchViewIn,searchViewOut;
 
     private MusicPlayerService musicSrv;
     private Intent playIntent;
-    private boolean musicBound=false;
+    private boolean musicBound = false;
+    private boolean isPlaying = false;      //  <--------Replace with function in MediaPlayer isPlaying()
+    public boolean shuffle=false;
+
+    private int selectedId = -1;
 
     private static final int READ_STORAGE_PERMISSION_REQUEST_CODE = 0;
 
@@ -46,11 +67,36 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ConstraintLayout topLayout = findViewById(R.id.topLayout);
         initSongs();
-        SearchView searchView = findViewById(R.id.mainSearchView);
+        searchView = findViewById(R.id.mainSearchView);
         searchView.setOnQueryTextListener(this);
+
+        searchViewIn = AnimationUtils.loadAnimation(this, R.anim.search_view_in_animation);
+        searchViewOut = AnimationUtils.loadAnimation(this, R.anim.search_view_out_animation);
+
         queueButton = findViewById(R.id.queueButton);
         queueButton.setOnDragListener(new DragListener());//<----HERE
+
+        boolean isLeftToRight= TextUtils.getLayoutDirectionFromLocale(Locale.getDefault())==View.LAYOUT_DIRECTION_LTR;
+
+        controlsLayout = findViewById(R.id.controlsLayout);
+        controlsLayout.bringToFront();
+        searchLayout = findViewById(R.id.searchLayout);
+        searchLayout.bringToFront();
+        searchView.bringToFront();
+        if(isLeftToRight){
+             searchView.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+             searchView.setTextDirection(View.TEXT_DIRECTION_LTR);}
+        else{
+            searchView.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
+            searchView.setTextDirection(View.TEXT_DIRECTION_RTL);}
+
+
+
+
+        playButton = findViewById(R.id.playButton);
+        currentLabel = findViewById(R.id.currentTrackLabel);
     }
 
 
@@ -58,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     protected void onStart() {
         Log.d(TAG, "onStart: called <-----");
         super.onStart();
-        if(playIntent==null){
+        if (playIntent == null) {
             playIntent = new Intent(this, MusicPlayerService.class);
             bindService(playIntent, musicConnection, this.BIND_AUTO_CREATE);
             startService(playIntent);
@@ -66,11 +112,11 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     }
 
     //connect to the service
-    private ServiceConnection musicConnection = new ServiceConnection(){
+    private ServiceConnection musicConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            MusicPlayerService.MusicBinder binder = (MusicPlayerService.MusicBinder)service;
+            MusicPlayerService.MusicBinder binder = (MusicPlayerService.MusicBinder) service;
             //get service
             musicSrv = binder.getService();
             Log.d(TAG, "onServiceConnected: called <------");
@@ -85,60 +131,84 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         }
     };
 
-    private void initSongs(){
+    private void initSongs() {
         Log.d(TAG, "initSongs: started initing names and artisis");
-        if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-        if(checkPermissionForReadExternalStorage()) {
-            Log.d(TAG, "PERMISSION ---->: "+checkPermissionForReadExternalStorage());
-            loader = new MusicLoader(this);
-            songArray = loader.getSongList();
-        }else
-            requestPermissionForReadExternalStorage();
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            if (checkPermissionForReadExternalStorage()) {
+                Log.d(TAG, "PERMISSION ---->: " + checkPermissionForReadExternalStorage());
+                loader = new MusicLoader(this);
+                songArray = loader.getSongList();
+            } else
+                requestPermissionForReadExternalStorage();
         else {
             loader = new MusicLoader(this);
             songArray = loader.getSongList();
         }
-        /**
-        songArray.add(new SongObject("Bohemian Rhapsody","Queen"));
-        songArray.add(new SongObject("Time","Pink Floyd"));
-        songArray.add(new SongObject("Another One Bites The Dust","Queen"));
-        songArray.add(new SongObject("Come As You Are","Nirvana"));
-        songArray.add(new SongObject("Could You Be Loved","Bob Marley"));
-        songArray.add(new SongObject("Billie Jean","Michael Jackson"));
-        songArray.add(new SongObject("Hips Don't Lie","Shakira"));
-        songArray.add(new SongObject("Paradise","Coldplay"));
-        songArray.add(new SongObject("In The End","Linkin Park"));
-        songArray.add(new SongObject("Love The Way You Lie","Eminem"));
-
-
-        titles.add("Bohemian Rhapsody");
-        artists.add("Queen");
-        titles.add("Time");
-        artists.add("Pink Floyd");
-        titles.add("Another One Bites The Dust");
-        artists.add("Queen");
-        titles.add("Come As You Are");
-        artists.add("Nirvana");
-        titles.add("Could You Be Loved");
-        artists.add("Bob Marley");
-        titles.add("Billie Jean");
-        artists.add("Michael Jackson");
-        titles.add("Hips Don't Lie");
-        artists.add("Shakira");
-        titles.add("Paradise");
-        artists.add("Coldplay");
-        titles.add("In The End");
-        artists.add("Linkin Park");
-        titles.add("Love The Way You Lie");
-        artists.add("Eminem"); **/
+        Collections.sort(songArray);
 
         initRecyclerView();
     }
+    static int y;
 
-    private void initRecyclerView(){
+    private void initRecyclerView() {
         Log.d(TAG, "initRecyclerView: Starting recyclerview");
         recyclerView = findViewById(R.id.mainRecyclerView);
-        adapter = new MainRecyclerViewAdapter(this,songArray);
+
+    /**    recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                 super.onScrolled(recyclerView, dx, dy);
+                 y = dy;
+                 if(dy>0) {
+
+                     searchView.startAnimation(searchViewOut);
+                     searchView.setVisibility(View.GONE);
+                 }
+               //  else
+               //      searchView.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+              //  if(recyclerView.SCROLL_STATE_DRAGGING==newState){
+
+                //    if(y>0) {
+                  //      searchView.setVisibility(View.VISIBLE);
+                    //    searchView.startAnimation(searchViewIn);
+                    //}
+                  //  else{
+                    //    searchView.startAnimation(searchViewOut);
+                      //  searchView.setVisibility(View.GONE);
+                    //}
+               // }
+                if(recyclerView.SCROLL_STATE_IDLE==newState){
+                    if(y>0){
+
+                    // fragProductLl.setVisibility(View.VISIBLE);
+                  //  if(y<0){   //<=
+                        searchView.setVisibility(View.VISIBLE);
+                        searchView.startAnimation(searchViewIn);
+                    }
+                    else{
+                      //  y=0;
+                       // searchView.startAnimation(searchViewOut);
+                        searchView.setVisibility(View.GONE);
+                    //}
+                }
+            }
+        });**/
+
+
+
+        boolean isLeftToRight= TextUtils.getLayoutDirectionFromLocale(Locale.getDefault())==View.LAYOUT_DIRECTION_LTR;
+
+        if(isLeftToRight)
+            recyclerView.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        else
+            recyclerView.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
+
+        adapter = new MainRecyclerViewAdapter(this, songArray);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -156,13 +226,13 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
-               // adapter.removeSong(viewHolder.getAdapterPosition());
+                // adapter.removeSong(viewHolder.getAdapterPosition());
                 removeSong(viewHolder.getAdapterPosition());
                 //songArray.remove(viewHolder.getAdapterPosition());
                 adapter.updateList(songArray);
             }
         };
-    return simpleCallback;
+        return simpleCallback;
     }
 
     @Override
@@ -174,13 +244,13 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     public boolean onQueryTextChange(String query) {
         ArrayList<SongObject> filteredList = new ArrayList<>();
 
-        for(SongObject s:songArray){
-            if(s.title.toLowerCase().contains(query.toLowerCase()) || s.artist.toLowerCase().contains(query.toLowerCase())){
+        for (SongObject s : songArray) {
+            if (s.title.toLowerCase().contains(query.toLowerCase()) || s.artist.toLowerCase().contains(query.toLowerCase())) {
                 filteredList.add(s);
             }
         }
         adapter.updateList(filteredList);
-       // musicSrv.setList(filteredList);
+        // musicSrv.setList(filteredList);
 
         return true;
     }
@@ -210,34 +280,135 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             // Request for camera permission.
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission has been granted. Start camera preview Activity.
-             //   Snackbar.make(mLayout, R.string.camera_permission_granted,
-               //         Snackbar.LENGTH_SHORT)
-                 //       .show();
+                //   Snackbar.make(mLayout, R.string.camera_permission_granted,
+                //         Snackbar.LENGTH_SHORT)
+                //       .show();
                 initSongs();
             } else {
-                Toast.makeText(this,"Uh Oh.....Bye Bye !!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Uh Oh.....Bye Bye !!", Toast.LENGTH_SHORT).show();
                 // Permission request was denied.
-             //   Snackbar.make(mLayout, R.string.camera_permission_denied,
-               //         Snackbar.LENGTH_SHORT)
-                 //       .show();
+                //   Snackbar.make(mLayout, R.string.camera_permission_denied,
+                //         Snackbar.LENGTH_SHORT)
+                //       .show();
             }
         }
         // END_INCLUDE(onRequestPermissionsResult)
     }
 
-    public void songPicked(View view){
-        musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
+    public void songPicked(View view) {
+        this.selectedId = Integer.parseInt(view.getTag().toString());
+        musicSrv.setSong(selectedId);
         musicSrv.playSong();
+        this.isPlaying = true;
+        playButton.setImageResource(R.drawable.pause_icon);
+        adapter.setSelectedId(selectedId);
+        adapter.notifyDataSetChanged();
+        changeCurrentTitle(selectedId);
     }
 
-    private void removeSong(int i){
+    public void changeCurrentTitle(long id){
+        for(SongObject x:songArray)
+            if(x.equals(id))
+                currentLabel.setText(x.title);
+
+    }
+
+    public void nextSong(View v){
+        int index = 0;
+        long id = 0;
+        try{
+        if(this.selectedId!=-1)
+            for(SongObject x:songArray)
+                if(x.equals(this.selectedId)){
+                    index = songArray.indexOf(x)+1;
+                    id = songArray.get(index).id;
+                    musicSrv.setSong((int)id);
+                    musicSrv.playSong();
+                    this.isPlaying = true;
+                    playButton.setImageResource(R.drawable.pause_icon);
+                    adapter.setSelectedId(id);
+                    adapter.notifyDataSetChanged();
+                    recyclerView.getLayoutManager().scrollToPosition(index+1);
+                    changeCurrentTitle(id);
+                    selectedId = (int)id;
+                    return;
+    }}
+    catch (ArrayIndexOutOfBoundsException e){
+        Log.d(TAG, "nextSong: LIST END REACHED");
+    }
+        
+        }
+
+    public void prevSong(View v){
+        int index = 0;
+        long id = 0;
+        try{
+        if(this.selectedId!=-1)
+            for(SongObject x:songArray)
+                if(x.equals(this.selectedId)){
+                    index = songArray.indexOf(x)-1;
+                    id = songArray.get(index).id;
+                    musicSrv.setSong((int)id);
+                    musicSrv.playSong();
+                    this.isPlaying = true;
+                    playButton.setImageResource(R.drawable.pause_icon);
+                    adapter.setSelectedId(id);
+                    adapter.notifyDataSetChanged();
+                    recyclerView.getLayoutManager().scrollToPosition(index-1);
+                    changeCurrentTitle(id);
+                    selectedId = (int)id;
+                    return;
+                }}
+        catch(ArrayIndexOutOfBoundsException e){
+            Log.d(TAG, "prevSong: LIST END REACHED");
+            }
+        }
+
+    private void removeSong(int i) {
         long id = Integer.parseInt(recyclerView.findViewHolderForLayoutPosition(i).itemView.getTag().toString());
-        for(int x=0;x<songArray.size();x++)
-            if(songArray.get(x).id == id) {
+        for (int x = 0; x < songArray.size(); x++)
+            if (songArray.get(x).id == id) {
                 songArray.remove(x);
-                Snackbar.make(recyclerView, "Removed "+songArray.get(x).title,Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(recyclerView, "Removed " + songArray.get(x).title, Snackbar.LENGTH_SHORT).show();
             }
 
     }
 
+    public void playPause(View v){
+
+        if(isPlaying) {
+            musicSrv.pauseSong();
+            isPlaying = false;
+            playButton.setImageResource(R.drawable.play_icon);
+        }else{
+            musicSrv.resumeSong();
+            isPlaying = true;
+            playButton.setImageResource(R.drawable.pause_icon);
+        }
+
+
+    }
+
+    @Override
+    public void onBackPressed(){
+      /**  View v = this.getCurrentFocus();
+        if(v!=null) {
+            InputMethodManager im = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+            im.hideSoftInputFromWindow(v.getWindowToken(), 0);
+        }**/
+        if(!searchView.isIconified())
+            searchView.setIconified(true);
+        else
+            super.onBackPressed();
+        }
+
+
+
+    @Override
+    protected void onDestroy() {
+        stopService(playIntent);
+        musicSrv = null;
+        unbindService(musicConnection);
+        super.onDestroy();
+    }
 }

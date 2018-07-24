@@ -1,24 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mainSongListItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="5dp"
-    android:layout_marginStart="25dp"
-    android:layout_marginTop="5dp"
+    android:background="@drawable/song_selection_bg"
     android:clickable="true"
-    android:onClick="songPicked">
+    android:layoutDirection="locale"
+    android:onClick="songPicked"
+    android:paddingBottom="5dp"
+    android:paddingEnd="25dp"
+    android:paddingStart="25dp"
+    android:paddingTop="5dp"
+    android:textDirection="locale">
 
     <TextView
         android:id="@+id/mainSongListTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/hkgrotesk_regular"
+        android:layoutDirection="inherit"
         android:singleLine="true"
         android:text="Title"
         android:textColor="#000000"
-        android:textSize="25sp" />
+        android:textDirection="inherit"
+        android:textSize="25sp"
+        app:layout_constraintBottom_toTopOf="@+id/mainSongListArtist"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/mainSongListArtist"
@@ -27,6 +36,8 @@
         android:fontFamily="@font/hkgrotesk_regular"
         android:singleLine="true"
         android:text="Artist"
+        android:textDirection="inherit"
         android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/mainSongListTitle" />
 </android.support.constraint.ConstraintLayout>

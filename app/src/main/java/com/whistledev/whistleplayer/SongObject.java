@@ -18,4 +18,10 @@ public class SongObject implements Comparable<SongObject> {
     public int compareTo(@NonNull SongObject songObject) {
         return title.compareToIgnoreCase(songObject.title);
     }
+
+    public boolean equals(long id){
+        if(id == this.id)
+            return true;
+        return false;
+    }
 }

@@ -103,4 +103,10 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
     public void setSong(int songId){
         currId=songId;
     }
+    protected  void pauseSong(){
+        player.pause();
+    }
+    protected void resumeSong(){
+        player.start();
+    }
 }
