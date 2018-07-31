@@ -23,28 +23,31 @@ public class ControlsLayout extends ViewGroup {
 
     private int shadowHeight = 5; // dp
 
-    public ControlsLayout(Context c, AttributeSet attrs){
+    public ControlsLayout(Context c, AttributeSet attrs) {
 
         super(c,attrs);
         this.setWillNotDraw(false);
 
         TypedArray a = c.getTheme().obtainStyledAttributes(attrs, R.styleable.ControlsLayout, 0, 0);
+
         try {
+
             isVertical = a.getBoolean(R.styleable.ControlsLayout_isVertical,true);
         } finally {
+
             a.recycle();
         }
 
         if(isVertical)
-            shadowDrawable = getResources().getDrawable(R.drawable.shadow_up);           // Shadow
+            shadowDrawable = getResources().getDrawable(R.drawable.shadow_up);           // Shadow for the controls
         else
-            shadowDrawable = getResources().getDrawable(R.drawable.shadow_down);
+            shadowDrawable = getResources().getDrawable(R.drawable.shadow_down);        // Shadow for the search bar
 
         backgroundDrawable = getResources().getDrawable(R.drawable.controls_bg);     // White Background
     }
 
     @Override
-    protected void onDraw(Canvas c){
+    protected void onDraw(Canvas c) {
 
         super.onDraw(c);
         final int right = getRight();
@@ -59,7 +62,7 @@ public class ControlsLayout extends ViewGroup {
             bottom = shadowHeight;
             backgroundDrawable.setBounds(left,bottom,right,getBottom());
         }
-        else{
+        else {
             // Shadow on Bottom
 
             top = this.getBottom()-shadowHeight;
@@ -74,12 +77,13 @@ public class ControlsLayout extends ViewGroup {
     }
 
     @Override
-    protected void onLayout(boolean b, int i, int i1, int i2, int i3){
+    protected void onLayout(boolean b, int i, int i1, int i2, int i3) {
         // Vertical Linear layout starting from below the shadow.
 
         int count = getChildCount();
         int prevChildLeft = 0;
         int prevChildTop = 0;//change this
+
         if(isVertical)       // If Vertical, start drawing child from below shadow.
             prevChildTop = shadowHeight;
 
@@ -90,10 +94,11 @@ public class ControlsLayout extends ViewGroup {
             child.layout(prevChildLeft, prevChildTop, prevChildLeft + child.getMeasuredWidth(), prevChildTop + child.getMeasuredHeight());
             prevChildTop += child.getMeasuredHeight();
         }
+        this.bringToFront();
     }
 
     @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec){
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         int width = ((View)this.getParent()).getWidth();  // = match_parent
@@ -105,17 +110,18 @@ public class ControlsLayout extends ViewGroup {
             measureChild(child, widthMeasureSpec, heightMeasureSpec);
             height += child.getMeasuredHeight();          // = wrap_content
         }
+
         this.setMeasuredDimension(width,height);
     }
 
     @Override
-    public boolean shouldDelayChildPressedState(){
+    public boolean shouldDelayChildPressedState() {
 
         return false;
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent e){
+    public boolean onTouchEvent(MotionEvent e) {
         // This prevents the layout from being click-through ie, passing touch events to the recyclerview behind it.
 
         return true;
